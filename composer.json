@@ -1,0 +1,39 @@
+{
+    "name": "marcorieser/statamic-instagram",
+    "autoload": {
+        "psr-4": {
+            "MarcoRieser\\StatamicInstagram\\": "src"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "MarcoRieser\\StatamicInstagram\\Tests\\": "tests"
+        }
+    },
+    "require": {
+        "statamic/cms": "^5.0",
+        "laravel/framework": "^11.0"
+    },
+    "require-dev": {
+        "orchestra/testbench": "^9.0",
+        "spatie/laravel-ray": "^1.37"
+    },
+    "config": {
+        "allow-plugins": {
+            "pixelfear/composer-dist-plugin": true
+        }
+    },
+    "extra": {
+        "statamic": {
+            "name": "Statamic Instagram",
+            "description": "Statamic Instagram lets you fetch data via the Instagram API into your Statamic site."
+        },
+        "laravel": {
+            "providers": [
+                "MarcoRieser\\StatamicInstagram\\ServiceProvider"
+            ]
+        }
+    },
+    "minimum-stability": "dev",
+    "prefer-stable": true
+}
