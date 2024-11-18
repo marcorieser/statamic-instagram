@@ -9,14 +9,14 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 
-class InstagramFeed extends Tags
+class Instagram extends Tags
 {
     protected string $apiBaseUrl = 'https://graph.instagram.com/v21.0';
 
     /**
-     * The {{ instagram_feed }} tag.
+     * The {{ instagram:feed limit="12" }} tag.
      */
-    public function index(): array
+    public function feed(): array
     {
         if (!$this->getAccessToken() || !$this->getUserId()) {
             return [];
@@ -77,7 +77,8 @@ class InstagramFeed extends Tags
         try {
             return Cache::remember(
                 $cacheKey,
-                now()->addSeconds(config('statamic-instagram.cache.duration')),
+//                now()->addSeconds(config('statamic-instagram.cache.duration')),
+                0,
                 function () use ($limit) {
                     $response = Http::get("$this->apiBaseUrl/{$this->getUserId()}/media", [
                         'limit' => $limit,
@@ -100,6 +101,7 @@ class InstagramFeed extends Tags
 
                     return $response->collect('data')
                         ->map($this->sanitizeMedia())
+                        ->map($this->cacheMedia())
                         ->all();
                 }
             );
@@ -123,11 +125,27 @@ class InstagramFeed extends Tags
             if (Arr::has($media, 'children')) {
                 $media['children'] = collect($media['children']['data'])
                     ->map($this->fetchChildMedia())
+                    ->filter()
                     ->map($this->sanitizeMedia())
+                    ->map($this->cacheMedia())
                     ->all();
             }
 
             return $media;
+        };
+    }
+
+    protected function cacheMedia(): \Closure
+    {
+        return function (array $media) {
+            $cacheKey = config('statamic-instagram.cache.key_prefix') . '_media_' . $media['id'];
+            return Cache::remember(
+                $cacheKey,
+                now()->addSeconds(config('statamic-instagram.cache.duration')),
+                function () use ($media) {
+                    return $media;
+                }
+            );
         };
     }
 
@@ -159,5 +177,23 @@ class InstagramFeed extends Tags
                 return [];
             }
         };
+    }
+
+    /**
+     * The {{ instagram:proxy }} tag.
+     */
+    public function proxy(): ?string
+    {
+        if (!($id = $this->params->get('id') ?? $this->context->get('id'))) {
+            return null;
+        }
+
+        if (!($media = Cache::get(config('statamic-instagram.cache.key_prefix') . '_media_' . $id))) {
+            return null;
+        }
+
+        $path = parse_url(Arr::get($media, 'thumbnail_url') ?? Arr::get($media, 'media_url'), PHP_URL_PATH);
+
+        return route('statamic.statamic-instagram.proxy', ['id' => $id, 'extension' => pathinfo($path, PATHINFO_EXTENSION)]);
     }
 }
