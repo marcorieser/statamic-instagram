@@ -25,6 +25,24 @@ class Instagram extends Tags
         return $this->fetchFeed();
     }
 
+    /**
+     * The {{ instagram:proxy }} tag.
+     */
+    public function proxy(): ?string
+    {
+        if (!($id = $this->params->get('id') ?? $this->context->get('id'))) {
+            return null;
+        }
+
+        if (!($media = Cache::get(config('statamic-instagram.cache.key_prefix') . '_media_' . $id))) {
+            return null;
+        }
+
+        $path = parse_url(Arr::get($media, 'thumbnail_url') ?? Arr::get($media, 'media_url'), PHP_URL_PATH);
+
+        return route('statamic.statamic-instagram.proxy', ['id' => $id, 'extension' => pathinfo($path, PATHINFO_EXTENSION)]);
+    }
+
     protected function getAccessToken(): ?string
     {
         try {
@@ -77,8 +95,7 @@ class Instagram extends Tags
         try {
             return Cache::remember(
                 $cacheKey,
-//                now()->addSeconds(config('statamic-instagram.cache.duration')),
-                0,
+                now()->addSeconds(config('statamic-instagram.cache.duration')),
                 function () use ($limit) {
                     $response = Http::get("$this->apiBaseUrl/{$this->getUserId()}/media", [
                         'limit' => $limit,
@@ -177,23 +194,5 @@ class Instagram extends Tags
                 return [];
             }
         };
-    }
-
-    /**
-     * The {{ instagram:proxy }} tag.
-     */
-    public function proxy(): ?string
-    {
-        if (!($id = $this->params->get('id') ?? $this->context->get('id'))) {
-            return null;
-        }
-
-        if (!($media = Cache::get(config('statamic-instagram.cache.key_prefix') . '_media_' . $id))) {
-            return null;
-        }
-
-        $path = parse_url(Arr::get($media, 'thumbnail_url') ?? Arr::get($media, 'media_url'), PHP_URL_PATH);
-
-        return route('statamic.statamic-instagram.proxy', ['id' => $id, 'extension' => pathinfo($path, PATHINFO_EXTENSION)]);
     }
 }
