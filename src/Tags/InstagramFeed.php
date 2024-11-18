@@ -2,8 +2,11 @@
 
 namespace MarcoRieser\StatamicInstagram\Tags;
 
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Http;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Tags;
 
 class InstagramFeed extends Tags
@@ -15,47 +18,11 @@ class InstagramFeed extends Tags
      */
     public function index(): array
     {
-        $limit = $this->params->int('limit', 12);
-        $cacheKey = config('statamic-instagram.cache.key_prefix') . '_feed_' . $limit;
-
-        if (!($accessToken = $this->getAccessToken())) {
+        if (!$this->getAccessToken() || !$this->getUserId()) {
             return [];
         }
 
-        if (!($userId = $this->getUserId())) {
-            return [];
-        }
-
-        try {
-            return Cache::remember(
-                $cacheKey,
-                now()->addSeconds(config('statamic-instagram.cache.duration')),
-                function () use ($accessToken, $limit, $userId) {
-                    $response = Http::get("$this->apiBaseUrl/{$userId}/media", [
-                        'limit' => $limit,
-                        'fields' => collect([
-                            'id',
-                            'caption',
-                            'media_type',
-                            'media_url',
-                            'permalink',
-                            'thumbnail_url',
-                            'timestamp',
-                        ])->join(','),
-                        'access_token' => $accessToken,
-                    ]);
-
-                    if (!$response->successful()) {
-                        throw new \RuntimeException('Could not retrieve media.');
-                    }
-
-                    return $response->collect('data')->all();
-                }
-            );
-        } catch (\Exception $exception) {
-            \Log::alert('Instagram error: ' . $exception->getMessage());
-            return [];
-        }
+        return $this->fetchFeed();
     }
 
     protected function getAccessToken(): ?string
@@ -100,5 +67,97 @@ class InstagramFeed extends Tags
             \Log::alert('Instagram error: ' . $exception->getMessage());
             return null;
         }
+    }
+
+    protected function fetchFeed(): array
+    {
+        $limit = $this->params->int('limit', 12);
+        $cacheKey = config('statamic-instagram.cache.key_prefix') . '_feed_' . $limit;
+
+        try {
+            return Cache::remember(
+                $cacheKey,
+                now()->addSeconds(config('statamic-instagram.cache.duration')),
+                function () use ($limit) {
+                    $response = Http::get("$this->apiBaseUrl/{$this->getUserId()}/media", [
+                        'limit' => $limit,
+                        'fields' => collect([
+                            'id',
+                            'caption',
+                            'media_type',
+                            'media_url',
+                            'permalink',
+                            'thumbnail_url',
+                            'timestamp',
+                            'children'
+                        ])->join(','),
+                        'access_token' => $this->getAccessToken(),
+                    ]);
+
+                    if (!$response->successful()) {
+                        throw new \RuntimeException('Could not retrieve media list.');
+                    }
+
+                    return $response->collect('data')
+                        ->map($this->sanitizeMedia())
+                        ->all();
+                }
+            );
+        } catch (\Exception $exception) {
+            \Log::alert('Instagram error: ' . $exception->getMessage());
+            return [];
+        }
+    }
+
+    protected function sanitizeMedia(): \Closure
+    {
+        return function (array $media) {
+            if (Arr::has($media, 'timestamp')) {
+                $media['timestamp'] = Carbon::parse($media['timestamp']);
+            }
+
+            if (Arr::has($media, 'media_type')) {
+                $media['media_type'] = Str::lower($media['media_type']);
+            }
+
+            if (Arr::has($media, 'children')) {
+                $media['children'] = collect($media['children']['data'])
+                    ->map($this->fetchChildMedia())
+                    ->map($this->sanitizeMedia())
+                    ->all();
+            }
+
+            return $media;
+        };
+    }
+
+    protected function fetchChildMedia(): \Closure
+    {
+        return function (array $child) {
+            $id = $child['id'];
+            try {
+                $response = Http::get("$this->apiBaseUrl/$id", [
+                    'fields' => collect([
+                        'id',
+                        'media_type',
+                        'media_url',
+                        'thumbnail_url',
+                        'permalink',
+                        'timestamp',
+                    ])->join(','),
+                    'access_token' => $this->getAccessToken(),
+                ]);
+
+                if (!$response->successful()) {
+                    throw new \RuntimeException("Could not retrieve media with id $id.");
+                }
+
+                return $response->collect()->all();
+
+            } catch (\Exception $exception) {
+                \Log::alert('Instagram error: ' . $exception->getMessage());
+                return [];
+            }
+        };
     }
 }
