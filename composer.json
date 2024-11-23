@@ -11,8 +11,9 @@
         }
     },
     "require": {
-        "statamic/cms": "^5.0",
-        "laravel/framework": "^11.0"
+        "edalzell/forma": "^3.0",
+        "laravel/framework": "^11.0",
+        "statamic/cms": "^5.0"
     },
     "require-dev": {
         "orchestra/testbench": "^9.0"
@@ -24,8 +25,8 @@
     },
     "extra": {
         "statamic": {
-            "name": "Statamic Instagram",
-            "description": "Statamic Instagram lets you fetch data via the Instagram API into your Statamic site."
+            "name": "Instagram",
+            "description": "Statamic Instagram lets you fetch data via the Instagram Business API into your Statamic site."
         },
         "laravel": {
             "providers": [

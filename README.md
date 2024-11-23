@@ -1,6 +1,6 @@
 # Statamic Instagram
 
-> Statamic Instagram lets you fetch data via the Instagram API into your Statamic site.
+> Statamic Instagram lets you fetch data via the Instagram Business API into your Statamic site.
 
 ## Features
 
