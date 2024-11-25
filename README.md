@@ -1,14 +1,14 @@
-# Statamic Instagram
+# Statamic Instagram Business API
 
-> Statamic Instagram lets you fetch data via the Instagram Business API into your Statamic site.
+> Statamic Instagram Business API lets you fetch data via the Instagram Business API into your Statamic site.
 
 ## Features
 
-- Fetch Instagram posts via Meta's [Instagram API](https://developers.facebook.com/docs/instagram-platform)
+- Fetch Instagram posts via Meta's [Instagram Business API](https://developers.facebook.com/docs/instagram-platform)
 - Support image manipulation through Glide by proxying the images
 
 ## Limitations
-- Currently, you are in charge of refreshing your Access Token once it expires. I hope to add auto refreshing very soon.
+- Currently, you are in charge of refreshing your Access Token once it expires. I hope to add auto-refreshing very soon.
 
 ## How to Install
 
