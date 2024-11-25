@@ -25,8 +25,8 @@
     },
     "extra": {
         "statamic": {
-            "name": "Instagram",
-            "description": "Statamic Instagram lets you fetch data via the Instagram Business API into your Statamic site."
+            "name": "Instagram Business API",
+            "description": "Statamic Instagram Business API lets you fetch data via the Instagram Business API into your Statamic site."
         },
         "laravel": {
             "providers": [
