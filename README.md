@@ -8,9 +8,7 @@
 - Support image manipulation through Glide by proxying the images
 
 ## Limitations
-
-- The Instagram feed gets generated on the `user_id` that is linked to the provided `ACCESS TOKEN` 
-- As of now, you have to bring your `ACCESS TOKEN` and are in change of refreshing it once it expires
+- As of now, you are in charge of refreshing your `ACCESS_TOKEN` once it expires
 
 ## How to Install
 
@@ -26,14 +24,43 @@ composer require marcorieser/statamic-instagram
 
 - Install the addon
 - Follow Meta's [docs](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/create-a-meta-app-with-instagram) on how to create an Access Token
-- Add your `STATAMIC_INSTAGRAM_ACCESS_TOKEN` to your `.env`
+- Publish the addon config by running `php artisan vendor:publish --tag=statamic-instagram-config`
+- Add your Access Token to the `account` section in the published config file or via the `Instagram` section in the Control Panel
 
 ### Display the feed
 
-There is a `{{ instagram:feed }}` tag, that fetches the posts and returns you an array of data. The `limit` parameter defaults to `12`. 
+There is a `{{ instagram:feed }}` tag, that fetches the media from the API and returns them as an array.
+
+- The `limit` parameter defaults to `12`.
+- The `handle` parameter defaults to the first account in the config.
 
 ```antlers
-{{ instagram:feed limit="12" }}
+{{ instagram:feed limit="12" handle="rickastley" }}
+    {{ id }}
+    {{ caption }}
+    {{ media_type }}
+    {{ media_url }}
+    {{ permalink }}
+    {{ timestamp }}
+    {{ thumbnail_url }}
+    
+    {{ children }}
+        {{ id }}
+        {{ media_type }}
+        {{ media_url }}
+        {{ permalink }}
+        {{ timestamp }}
+    {{ /children }}
+{{ /instagram:feed }}
+```
+### Display a specific media
+There is a `{{ instagram:media }}` tag, that fetches just one specific media.
+
+- The `id` parameter is required.
+- The `handle` parameter defaults to the first account in the config.
+
+```antlers
+{{ instagram:media id="18051623968824939" handle="rickastley" }}
     {{ id }}
     {{ caption }}
     {{ media_type }}
@@ -53,9 +80,12 @@ There is a `{{ instagram:feed }}` tag, that fetches the posts and returns you an
 ```
 
 ### Manipulate an image
-Right now, Glide does not support urls with query params. There is an [open PR](https://github.com/statamic/cms/pull/11003) for that. Until that gets merged, you can proxy with `{{ instagram:proxy }}` the image like that:
+Right now, Glide does not support urls with query params. There is an [open PR](https://github.com/statamic/cms/pull/11003) for that. Until that gets merged, you can proxy the url with the `ig_proxy` modifier like that:
 ```antlers
 {{ instagram:feed }}
-    <img src="{{ glide src="{instagram:proxy}" }}">
+    <img src="{{ glide src="{ media_url | ig_proxy}" width="500" }}">
 {{ /instagram:feed }}
 ```
+
+### Fetching Child Media
+By default, the addon does not fetch child media for e.g., Albums since that requires additional requests to the API. Therefore `children` is `null`. In case you need to child media, you can enable `include_child_posts` in the addon config. 
