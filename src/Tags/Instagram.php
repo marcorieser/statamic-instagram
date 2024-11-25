@@ -3,7 +3,6 @@
 namespace MarcoRieser\StatamicInstagram\Tags;
 
 use Illuminate\Support\Collection;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Log;
 use MarcoRieser\StatamicInstagram\Instagram as InstagramApi;
 use MarcoRieser\StatamicInstagram\Models\Media;
@@ -55,25 +54,6 @@ class Instagram extends Tags
 
             throw $e;
         }
-    }
-
-    /**
-     * The {{ instagram:proxy }} tag.
-     */
-    public function proxy(): ?string
-    {
-        if (!($id = $this->params->get('id') ?? $this->context->get('id'))) {
-            return null;
-        }
-
-        /** @var Media $media */
-        if (!($media = Cache::get(InstagramApi::getCacheKey('media', $id)))) {
-            return null;
-        }
-
-        $path = parse_url($media->thumbnail_url ?? $media->media_url, PHP_URL_PATH);
-
-        return route('statamic.statamic-instagram.proxy', ['id' => $id, 'extension' => pathinfo($path, PATHINFO_EXTENSION)]);
     }
 
     protected function shouldLog(): bool

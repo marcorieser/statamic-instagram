@@ -10,7 +10,6 @@ use Illuminate\Support\Str;
 use MarcoRieser\StatamicInstagram\Instagram;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
-use function collect;
 
 class Media implements Augmentable
 {
@@ -27,11 +26,7 @@ class Media implements Augmentable
         public ?Collection $children = null,
     )
     {
-        return Cache::remember(
-            Instagram::getCacheKey('media', $id),
-            now()->addSeconds(config('statamic-instagram.cache.duration')),
-            fn() => $this
-        );
+        $this->cache();
     }
 
     public static function fromApiData(array $media): self
@@ -57,7 +52,7 @@ class Media implements Augmentable
             $children = collect($children)->map(fn(array $media) => Media::fromApiData($media));
         }
 
-       return new self($id, $caption, $media_type, $media_url, $permalink, $thumbnail_url, $timestamp, $children);
+        return new self($id, $caption, $media_type, $media_url, $permalink, $thumbnail_url, $timestamp, $children);
     }
 
     public function values(): array
@@ -74,5 +69,30 @@ class Media implements Augmentable
         ])
             ->filter()
             ->all();
+    }
+
+    protected function cache(): void
+    {
+        Cache::remember(
+            Instagram::cacheKey('media', $this->id),
+            now()->addSeconds(config('statamic-instagram.cache.duration')),
+            fn() => $this
+        );
+
+        if ($this->thumbnail_url) {
+            Cache::remember(
+                Instagram::cacheKey('media_url', md5($this->thumbnail_url)),
+                now()->addSeconds(config('statamic-instagram.cache.duration')),
+                fn() => $this->thumbnail_url
+            );
+        }
+
+        if ($this->media_url && $this->media_type !== 'video') {
+            Cache::remember(
+                Instagram::cacheKey('media_url', md5($this->media_url)),
+                now()->addSeconds(config('statamic-instagram.cache.duration')),
+                fn() => $this->media_url
+            );
+        }
     }
 }

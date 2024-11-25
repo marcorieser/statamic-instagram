@@ -17,11 +17,11 @@ class Account
     public static function fromConfig(array $data): self
     {
         if (!($handle = Arr::get($data, 'handle'))) {
-            throw new InvalidArgumentException("The data doesn't have a valid handle");
+            throw new InvalidArgumentException("The account doesn't have a valid handle");
         }
 
         if (!($accessToken = Arr::get($data, 'access_token'))) {
-            throw new InvalidArgumentException("The data doesn't have a valid access_token");
+            throw new InvalidArgumentException("The account doesn't have a valid access_token");
         }
 
         return new self($handle, $accessToken);

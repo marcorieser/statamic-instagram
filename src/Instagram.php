@@ -20,10 +20,17 @@ class Instagram
     protected ?int $limit = null;
     protected ?Account $account = null;
 
+    public static function cacheKey(...$parts): string
+    {
+        return collect([
+            config('statamic-instagram.cache.key_prefix'),
+        ])->merge($parts)->implode('_');
+    }
+
     public function feed(): Collection
     {
         return Cache::remember(
-            $this->getCacheKey($this->getAccount()->handle, 'feed', $this->getLimit()),
+            $this->cacheKey($this->getAccount()->handle, 'feed', $this->getLimit()),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
                 $response = Http::get("$this->apiBaseUrl/{$this->getUserId()}/media", [
@@ -50,13 +57,6 @@ class Instagram
                     ->map(fn(array $media) => Media::fromApiData($media));
             }
         );
-    }
-
-    public static function getCacheKey(...$parts): string
-    {
-        return collect([
-            config('statamic-instagram.cache.key_prefix'),
-        ])->merge($parts)->implode('_');
     }
 
     public function getAccount(): Account
@@ -103,7 +103,7 @@ class Instagram
     public function getUserId(): string
     {
         return Cache::remember(
-            $this->getCacheKey($this->getAccount()->handle, "user_id"),
+            $this->cacheKey($this->getAccount()->handle, "user_id"),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
                 $response = Http::get($this->apiBaseUrl . '/me',
@@ -119,27 +119,6 @@ class Instagram
                 return $userId;
             }
         );
-    }
-
-    protected function completeChildMedia(): \Closure
-    {
-        return function (array $media) {
-            if (!config('statamic-instagram.include_child_posts')) {
-                $media['children'] = null;
-
-                return $media;
-            }
-
-            if (Arr::has($media, 'children')) {
-                $media['children'] = collect($media['children']['data'])
-                    ->map(fn(array $child) => $this->fetchChildMedia(Arr::get($child, 'id')))
-                    ->filter()
-                    ->map($this->completeChildMedia())
-                    ->all();
-            }
-
-            return $media;
-        };
     }
 
     public function getHandle(): string
@@ -164,6 +143,39 @@ class Instagram
         return $this;
     }
 
+    public function media(int $id): ?Media
+    {
+        if ($media = Cache::get($this->cacheKey('media', $id))) {
+            return $media;
+        }
+
+        return collect([$this->fetchMedia($id)])
+            ->map($this->completeChildMedia())
+            ->map(fn(array $media) => Media::fromApiData($media))
+            ->first();
+    }
+
+    protected function completeChildMedia(): \Closure
+    {
+        return function (array $media) {
+            if (!config('statamic-instagram.include_child_posts')) {
+                $media['children'] = null;
+
+                return $media;
+            }
+
+            if (Arr::has($media, 'children')) {
+                $media['children'] = collect($media['children']['data'])
+                    ->map(fn(array $child) => $this->fetchChildMedia(Arr::get($child, 'id')))
+                    ->filter()
+                    ->map($this->completeChildMedia())
+                    ->all();
+            }
+
+            return $media;
+        };
+    }
+
     protected function fetchChildMedia(int $id): array
     {
         $response = Http::get("$this->apiBaseUrl/$id", [
@@ -183,18 +195,6 @@ class Instagram
         }
 
         return $response->collect()->all();
-    }
-
-    public function media(int $id): ?Media
-    {
-        if ($media = Cache::get($this->getCacheKey('media', $id))) {
-            return $media;
-        }
-
-        return collect([$this->fetchMedia($id)])
-            ->map($this->completeChildMedia())
-            ->map(fn(array $media) => Media::fromApiData($media))
-            ->first();
     }
 
     protected function fetchMedia(int $id): array
