@@ -4,7 +4,7 @@ namespace MarcoRieser\StatamicInstagram\Tags;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
-use MarcoRieser\StatamicInstagram\Instagram as InstagramApi;
+use MarcoRieser\StatamicInstagram\InstagramAPI;
 use MarcoRieser\StatamicInstagram\Models\Media;
 use Statamic\Tags\Tags;
 
@@ -16,7 +16,7 @@ class Instagram extends Tags
     public function feed(): Collection
     {
         try {
-            $api = app(InstagramApi::class);
+            $api = app(InstagramAPI::class);
 
             if ($limit = $this->params->int('limit')) {
                 $api->setLimit($limit);
@@ -43,7 +43,7 @@ class Instagram extends Tags
     public function media(): ?Media
     {
         try {
-            $api = app(InstagramApi::class);
+            $api = app(InstagramAPI::class);
 
             if ($handle = $this->params->get('handle')) {
                 $api->setHandle($handle);

@@ -10,10 +10,9 @@ use Illuminate\Support\ItemNotFoundException;
 use MarcoRieser\StatamicInstagram\Models\Account;
 use MarcoRieser\StatamicInstagram\Models\Media;
 
-class Instagram
+class InstagramAPI
 {
     //TODO[mr]: renew token (24.11.2024 mr)
-    //TODO[mr]: update docs (24.11.2024 mr)
     protected string $apiBaseUrl = 'https://graph.instagram.com/v21.0';
 
     protected ?string $handle = null;

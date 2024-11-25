@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
-use MarcoRieser\StatamicInstagram\Instagram;
+use MarcoRieser\StatamicInstagram\InstagramAPI;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 
@@ -74,14 +74,14 @@ class Media implements Augmentable
     protected function cache(): void
     {
         Cache::remember(
-            Instagram::cacheKey('media', $this->id),
+            InstagramAPI::cacheKey('media', $this->id),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             fn() => $this
         );
 
         if ($this->thumbnail_url) {
             Cache::remember(
-                Instagram::cacheKey('media_url', md5($this->thumbnail_url)),
+                InstagramAPI::cacheKey('media_url', md5($this->thumbnail_url)),
                 now()->addSeconds(config('statamic-instagram.cache.duration')),
                 fn() => $this->thumbnail_url
             );
@@ -89,7 +89,7 @@ class Media implements Augmentable
 
         if ($this->media_url && $this->media_type !== 'video') {
             Cache::remember(
-                Instagram::cacheKey('media_url', md5($this->media_url)),
+                InstagramAPI::cacheKey('media_url', md5($this->media_url)),
                 now()->addSeconds(config('statamic-instagram.cache.duration')),
                 fn() => $this->media_url
             );

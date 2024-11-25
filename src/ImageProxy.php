@@ -12,7 +12,7 @@ class ImageProxy
 {
     public function __invoke(string $hash): Application|Response|ResponseFactory
     {
-        if (!($url = Cache::get(Instagram::cacheKey('media_url', $hash)))) {
+        if (!($url = Cache::get(InstagramAPI::cacheKey('media_url', $hash)))) {
             abort(404);
         }
 
