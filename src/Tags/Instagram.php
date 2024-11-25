@@ -38,12 +38,16 @@ class Instagram extends Tags
     }
 
     /**
-     * The {{ instagram:media id="17916135464919603" }} tag.
+     * The {{ instagram:media id="17916135464919603" handle="rickastley" }} tag.
      */
     public function media(): ?Media
     {
         try {
             $api = app(InstagramApi::class);
+
+            if ($handle = $this->params->get('handle')) {
+                $api->setHandle($handle);
+            }
 
             return $api->media($this->params->int('id'));
         } catch (\Exception $e) {
