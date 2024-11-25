@@ -94,6 +94,7 @@ In case you need child media, you can enable `include_child_posts` in the addon 
 
 ### Using the API in PHP
 There is a dedicated `InstagramAPI` class to interact with the API. Its public methods are:
+
 - `cacheKey(...$parts): string`
 - `feed(): Collection`
 - `getAccount(): Account`
