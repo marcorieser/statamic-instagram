@@ -12,7 +12,7 @@ return [
 
     'accounts' => [
         [
-            'handle' => '',
+            'handle' => 'default',
             'access_token' => '',
         ],
     ]
