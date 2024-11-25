@@ -88,7 +88,9 @@ Right now, Glide does not support urls with query params. There is an [open PR](
 ```
 
 ### Fetching Child Media
-By default, the addon does not fetch child media for e.g., Albums since that requires additional requests to the API. Therefore `children` is `null`. In case you need to child media, you can enable `include_child_posts` in the addon config. 
+By default, the addon does not fetch child media for e.g., Albums since that requires additional requests to the API.
+Therefore `children` is `null`.
+In case you need child media, you can enable `include_child_posts` in the addon config. 
 
 ### Using the API in PHP
 There is a dedicated `InstagramAPI` class to interact with the API. Its public methods are:
