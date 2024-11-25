@@ -8,7 +8,7 @@
 - Support image manipulation through Glide by proxying the images
 
 ## Limitations
-- As of now, you are in charge of refreshing your `ACCESS_TOKEN` once it expires
+- Currently, you are in charge of refreshing your Access Token once it expires. I hope to add auto refreshing very soon.
 
 ## How to Install
 
