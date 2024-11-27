@@ -37,11 +37,16 @@ class InstagramAPI
                     'fields' => collect([
                         'id',
                         'caption',
+                        'comments_count',
+                        'is_shared_to_feed',
+                        'like_count',
+                        'media_product_type',
                         'media_type',
                         'media_url',
                         'permalink',
                         'thumbnail_url',
                         'timestamp',
+                        'username',
                         'children'
                     ])->join(','),
                     'access_token' => $this->getAccount()->accessToken,
@@ -208,11 +213,15 @@ class InstagramAPI
         $response = Http::get("$this->businessApiBaseUrl/$id", [
             'fields' => collect([
                 'id',
+                'comments_count',
+                'like_count',
+                'media_product_type',
                 'media_type',
                 'media_url',
-                'thumbnail_url',
                 'permalink',
+                'thumbnail_url',
                 'timestamp',
+                'username'
             ])->join(','),
             'access_token' => $this->getAccount()->accessToken,
         ]);
@@ -230,11 +239,16 @@ class InstagramAPI
             'fields' => collect([
                 'id',
                 'caption',
+                'comments_count',
+                'is_shared_to_feed',
+                'like_count',
+                'media_product_type',
                 'media_type',
                 'media_url',
                 'permalink',
                 'thumbnail_url',
                 'timestamp',
+                'username',
                 'children'
             ])->join(','),
             'access_token' => $this->getAccount()->accessToken,
