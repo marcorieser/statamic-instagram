@@ -6,6 +6,7 @@
 
 - Fetch Instagram posts via Meta's [Instagram Business API](https://developers.facebook.com/docs/instagram-platform)
 - Support image manipulation through Glide by proxying the images
+- Auto refreshing of Access Tokens
 
 ## How to Install
 
