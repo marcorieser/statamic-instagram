@@ -82,18 +82,28 @@ There is a `{{ instagram:media }}` tag, that fetches just one specific media.
 {{ instagram:media id="18051623968824939" handle="rickastley" }}
     {{ id }}
     {{ caption }}
+    {{ comments_count }}
+    {{ is_shared_to_feed }}
+    {{ like_count }}
+    {{ media_product_type }}
     {{ media_type }}
     {{ media_url }}
     {{ permalink }}
-    {{ timestamp }}
     {{ thumbnail_url }}
-    
+    {{ timestamp }}
+    {{ username }}
+
     {{ children }}
         {{ id }}
+        {{ comments_count }}
+        {{ like_count }}
+        {{ media_product_type }}
         {{ media_type }}
         {{ media_url }}
         {{ permalink }}
+        {{ thumbnail_url }}
         {{ timestamp }}
+        {{ username }}
     {{ /children }}
 {{ /instagram:feed }}
 ```
