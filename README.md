@@ -24,6 +24,7 @@ composer require marcorieser/statamic-instagram
 - Add your Access Token to the `account` section in the published config file or via the `Instagram` section in the Control Panel. If you do not have a token, follow the instructions below.
 
 ### Creating a Meta App / an Access Token
+
 Create an Access Token for the API with these steps:
 
 - Login with your Instagram credentials at https://developers.facebook.com
