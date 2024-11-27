@@ -8,7 +8,7 @@ tabs:
             handle: accounts
             field:
               min_rows: 1
-              add_row: 'Add Token'
+              add_row: 'Add Account'
               fullscreen: false
               type: grid
               display: 'Accounts'
