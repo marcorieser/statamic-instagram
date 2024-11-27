@@ -164,3 +164,9 @@ For example, this is how you fetch the feed. This will return you a Collection o
     ->setHandle('rickastley')
     ->feed();
 ```
+
+## License
+
+Statamic Instagram Business API is paid software with an open-source codebase. 
+If you want to use it, you’ll need to buy a license from the Statamic Marketplace. 
+The license is valid for only one project. Statamic itself is commercial software and has its own license.
