@@ -25,6 +25,7 @@ composer require marcorieser/statamic-instagram
 
 ### Creating a Meta App / an Access Token
 Create an Access Token for the API with these steps:
+
 - Login with your Instagram credentials at https://developers.facebook.com
 - Create a new app (choose `Other` as use case and `Business` as the app type)
 - Add `Instagram` as a product to your app
