@@ -12,8 +12,8 @@ use MarcoRieser\StatamicInstagram\Models\Media;
 
 class InstagramAPI
 {
-    //TODO[mr]: renew token (24.11.2024 mr)
-    protected string $apiBaseUrl = 'https://graph.instagram.com/v21.0';
+    protected string $apiBaseUrl = 'https://graph.instagram.com';
+    protected string $businessApiBaseUrl = 'https://graph.instagram.com/v21.0';
 
     protected ?string $handle = null;
     protected ?int $limit = null;
@@ -32,7 +32,7 @@ class InstagramAPI
             $this->cacheKey($this->getAccount()->handle, 'feed', $this->getLimit()),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
-                $response = Http::get("$this->apiBaseUrl/{$this->getUserId()}/media", [
+                $response = Http::get("$this->businessApiBaseUrl/{$this->getUserId()}/media", [
                     'limit' => $this->getLimit(),
                     'fields' => collect([
                         'id',
@@ -105,7 +105,7 @@ class InstagramAPI
             $this->cacheKey($this->getAccount()->handle, "user_id"),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
-                $response = Http::get($this->apiBaseUrl . '/me',
+                $response = Http::get($this->businessApiBaseUrl . '/me',
                     [
                         'fields' => 'user_id',
                         'access_token' => $this->getAccount()->accessToken,
@@ -154,6 +154,34 @@ class InstagramAPI
             ->first();
     }
 
+    public function refreshAccessToken(): bool
+    {
+        $durationMinOneDayMaxTwoMonths = min(
+            now()->addMonths(2)->subDay(),
+            max(
+                now()->addSeconds(config('statamic-instagram.cache.duration')),
+                now()->addDay()
+            ),
+        );
+
+        return Cache::remember(
+            $this->cacheKey($this->getAccount()->handle, 'token_refreshed'),
+            $durationMinOneDayMaxTwoMonths,
+            function () {
+                $response = Http::get("$this->apiBaseUrl/refresh_access_token", [
+                    'grant_type' => 'ig_refresh_token',
+                    'access_token' => $this->getAccount()->accessToken,
+                ]);
+
+                if (!$response->successful()) {
+                    throw new \RuntimeException("Could not refresh access token for {$this->getAccount()->handle} account.");
+                }
+
+                return true;
+            }
+        );
+    }
+
     protected function completeChildMedia(): \Closure
     {
         return function (array $media) {
@@ -177,7 +205,7 @@ class InstagramAPI
 
     protected function fetchChildMedia(int $id): array
     {
-        $response = Http::get("$this->apiBaseUrl/$id", [
+        $response = Http::get("$this->businessApiBaseUrl/$id", [
             'fields' => collect([
                 'id',
                 'media_type',
@@ -198,7 +226,7 @@ class InstagramAPI
 
     protected function fetchMedia(int $id): array
     {
-        $response = Http::get("$this->apiBaseUrl/$id", [
+        $response = Http::get("$this->businessApiBaseUrl/$id", [
             'fields' => collect([
                 'id',
                 'caption',

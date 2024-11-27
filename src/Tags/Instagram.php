@@ -26,6 +26,8 @@ class Instagram extends Tags
                 $api->setHandle($handle);
             }
 
+            $api->refreshAccessToken();
+
             return $api->feed();
         } catch (\Exception $e) {
             if ($this->shouldLog()) {
@@ -48,6 +50,8 @@ class Instagram extends Tags
             if ($handle = $this->params->get('handle')) {
                 $api->setHandle($handle);
             }
+
+            $api->refreshAccessToken();
 
             return $api->media($this->params->int('id'));
         } catch (\Exception $e) {
