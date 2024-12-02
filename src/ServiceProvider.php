@@ -7,13 +7,6 @@ use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
 {
-    public function boot()
-    {
-        parent::boot();
-
-        Forma::add('marcorieser/statamic-instagram');
-    }
-
     public function bootAddon(): void
     {
         $this->mergeConfigFrom(__DIR__ . '/../config/statamic-instagram.php', 'statamic-instagram');

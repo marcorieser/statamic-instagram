@@ -1,22 +1,21 @@
 {
     "name": "marcorieser/statamic-instagram",
+    "description": "Statamic Instagram Business API lets you fetch data via the Instagram Business API into your Statamic site.",
+    "keywords": [
+        "statamic",
+        "instagram",
+        "api",
+        "business api"
+    ],
+    "license": "proprietary",
+    "require": {
+        "laravel/framework": "^11.0",
+        "statamic/cms": "^5.0"
+    },
     "autoload": {
         "psr-4": {
             "MarcoRieser\\StatamicInstagram\\": "src"
         }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "MarcoRieser\\StatamicInstagram\\Tests\\": "tests"
-        }
-    },
-    "require": {
-        "edalzell/forma": "^3.0",
-        "laravel/framework": "^11.0",
-        "statamic/cms": "^5.0"
-    },
-    "require-dev": {
-        "orchestra/testbench": "^9.0"
     },
     "config": {
         "allow-plugins": {

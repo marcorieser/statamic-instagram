@@ -22,7 +22,7 @@ composer require marcorieser/statamic-instagram
 
 - Install the addon
 - Publish the addon config by running `php artisan vendor:publish --tag=statamic-instagram-config`
-- Add your Access Token to the `account` section in the published config file or via the `Instagram` section in the Control Panel. If you do not have a token, follow the instructions below.
+- Add your Access Token to the `account` section in the published config file. If you do not have a token, follow the instructions below.
 
 ### Creating a Meta App / an Access Token
 
