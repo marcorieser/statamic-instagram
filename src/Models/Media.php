@@ -109,21 +109,5 @@ class Media implements Augmentable
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             fn() => $this
         );
-
-        if ($this->thumbnail_url) {
-            Cache::remember(
-                InstagramAPI::cacheKey('media_url', md5($this->thumbnail_url)),
-                now()->addSeconds(config('statamic-instagram.cache.duration')),
-                fn() => $this->thumbnail_url
-            );
-        }
-
-        if ($this->media_url && $this->media_type !== 'video') {
-            Cache::remember(
-                InstagramAPI::cacheKey('media_url', md5($this->media_url)),
-                now()->addSeconds(config('statamic-instagram.cache.duration')),
-                fn() => $this->media_url
-            );
-        }
     }
 }
