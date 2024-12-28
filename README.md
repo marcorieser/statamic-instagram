@@ -5,7 +5,6 @@
 ## Features
 
 - Fetch Instagram posts via Meta's [Instagram Business API](https://developers.facebook.com/docs/instagram-platform)
-- Support image manipulation through Glide by proxying the images
 - Auto refreshing of Access Tokens
 
 ## How to Install
@@ -111,14 +110,18 @@ There is a `{{ instagram:media }}` tag, that fetches just one specific media.
 
 ### Manipulate an image
 
-Right now, Glide does not support urls with query params. There is an [open PR](https://github.com/statamic/cms/pull/11003) for that. Until that gets merged, you can proxy the url with the `ig_proxy` modifier like that:
+You can manipulate external Instagram image URLs with Glide as usual:
+
 ```antlers
 {{ instagram:feed }}
-    {{ glide src="{ media_url | ig_proxy}" width="500" }}
-        <img src="{{ url }}" width="{{ width }}" height="{{ height }}">
+    {{ glide src="{thumbnail_url ?? media_url}" format="webp" width="500" }}
+        <img src="{{ url }}" width="{{ width }}" height="{{ height }}" alt="...">
     {{ /glide }}
 {{ /instagram:feed }}
 ```
+
+_Since Statamic `v5.43.0`, Glide supports external URLs with query params. Therefore, `v2` of this addon removes the ability to proxy images and drops the `ig_proxy` modifier._ 
+
 
 ### Refreshing Tokens
 

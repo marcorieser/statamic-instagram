@@ -10,7 +10,7 @@
     "license": "proprietary",
     "require": {
         "laravel/framework": "^11.0",
-        "statamic/cms": "^5.0"
+        "statamic/cms": "^5.43.0"
     },
     "autoload": {
         "psr-4": {
