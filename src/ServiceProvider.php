@@ -2,7 +2,6 @@
 
 namespace MarcoRieser\StatamicInstagram;
 
-use Edalzell\Forma\Forma;
 use Statamic\Providers\AddonServiceProvider;
 
 class ServiceProvider extends AddonServiceProvider
