@@ -2,6 +2,7 @@
 
 namespace MarcoRieser\StatamicInstagram;
 
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
@@ -53,7 +54,7 @@ class InstagramAPI
                 ]);
 
                 if (!$response->successful()) {
-                    throw new \RuntimeException('Could not fetch media list from API.');
+                    throw new \RuntimeException($this->formatException('Could not fetch media list from API.', $response));
                 }
 
                 return $response->collect('data')
@@ -117,7 +118,7 @@ class InstagramAPI
                     ]);
 
                 if (!$response->successful() || !($userId = $response->collect()->get('user_id'))) {
-                    throw new \RuntimeException('Could not fetch user_id from API.');
+                    throw new \RuntimeException($this->formatException('Could not fetch user_id from API.', $response));
                 }
 
                 return $userId;
@@ -179,7 +180,7 @@ class InstagramAPI
                 ]);
 
                 if (!$response->successful()) {
-                    throw new \RuntimeException("Could not refresh access token for {$this->getAccount()->handle} account.");
+                    throw new \RuntimeException($this->formatException("Could not refresh access token for {$this->getAccount()->handle} account.", $response));
                 }
 
                 return true;
@@ -227,7 +228,7 @@ class InstagramAPI
         ]);
 
         if (!$response->successful()) {
-            throw new \RuntimeException("Could not retrieve media with id $id.");
+            throw new \RuntimeException($this->formatException("Could not retrieve media with id $id.", $response));
         }
 
         return $response->collect()->all();
@@ -255,9 +256,19 @@ class InstagramAPI
         ]);
 
         if (!$response->successful()) {
-            throw new \RuntimeException("Could not retrieve media with id $id.");
+            throw new \RuntimeException($this->formatException("Could not retrieve media with id $id.", $response));
         }
 
         return $response->collect()->all();
+    }
+
+    protected function formatException(string $message, Response $response): string
+    {
+        if (!($error = $response->json('error'))) {
+            return $message;
+        }
+
+
+        return $message . ' ' . json_encode($error);
     }
 }
