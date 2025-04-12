@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\ItemNotFoundException;
 use MarcoRieser\StatamicInstagram\Models\Account;
 use MarcoRieser\StatamicInstagram\Models\Media;
+use MarcoRieser\StatamicInstagram\Models\Profile;
 
 class InstagramAPI
 {
@@ -25,6 +26,36 @@ class InstagramAPI
         return collect([
             config('statamic-instagram.cache.key_prefix'),
         ])->merge($parts)->implode('_');
+    }
+
+    public function profile(): Profile
+    {
+        return Cache::remember(
+            $this->cacheKey($this->getAccount()->handle, 'profile'),
+            now()->addSeconds(config('statamic-instagram.cache.duration')),
+            function () {
+                $response = Http::get("$this->businessApiBaseUrl/{$this->getUserId()}", [
+                    'fields' => collect([
+                        'biography',
+                        'followers_count',
+                        'follows_count',
+                        'id',
+                        'media_count',
+                        'name',
+                        'profile_picture_url',
+                        'username',
+                        'website',
+                    ])->join(','),
+                    'access_token' => $this->getAccount()->accessToken,
+                ]);
+
+                if (!$response->successful()) {
+                    throw new \RuntimeException($this->formatException('Could not fetch media list from API.', $response));
+                }
+
+                return Profile::fromApiData($response->json());
+            }
+        );
     }
 
     public function feed(): Collection

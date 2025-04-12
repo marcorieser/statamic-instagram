@@ -6,10 +6,36 @@ use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use MarcoRieser\StatamicInstagram\InstagramAPI;
 use MarcoRieser\StatamicInstagram\Models\Media;
+use MarcoRieser\StatamicInstagram\Models\Profile;
 use Statamic\Tags\Tags;
 
 class Instagram extends Tags
 {
+    /**
+     * The {{ instagram:profile handle="rickastley" }} tag.
+     */
+    public function profile(): ?Profile
+    {
+        try {
+            $api = app(InstagramAPI::class);
+
+            if ($handle = $this->params->get('handle')) {
+                $api->setHandle($handle);
+            }
+
+            $api->refreshAccessToken();
+
+            return $api->profile();
+        } catch (\Exception $e) {
+            if ($this->shouldLog()) {
+                Log::error($e);
+                return null;
+            }
+
+            throw $e;
+        }
+    }
+
     /**
      * The {{ instagram:feed limit="12" handle="rickastley" }} tag.
      */
