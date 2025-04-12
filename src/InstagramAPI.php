@@ -15,7 +15,7 @@ use MarcoRieser\StatamicInstagram\Models\Profile;
 class InstagramAPI
 {
     protected string $apiBaseUrl = 'https://graph.instagram.com';
-    protected string $businessApiBaseUrl = 'https://graph.instagram.com/v21.0';
+    protected string $businessApiBaseUrl = 'https://graph.instagram.com/v22.0';
 
     protected ?string $handle = null;
     protected ?int $limit = null;
