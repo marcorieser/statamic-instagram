@@ -99,6 +99,7 @@ class Media implements Augmentable
             'children' => $this->children,
         ])
             ->filter()
+            ->sortKeys()
             ->all();
     }
 
