@@ -5,6 +5,7 @@
 ## Features
 
 - Fetch Instagram posts via Meta's [Instagram Business API](https://developers.facebook.com/docs/instagram-platform)
+- Fetch Instagram profile data via Meta's [Instagram Business API](https://developers.facebook.com/docs/instagram-platform)
 - Auto refreshing of Access Tokens
 
 ## How to Install
@@ -71,6 +72,7 @@ There is a `{{ instagram:feed }}` tag, that fetches the media from the API and r
     {{ /children }}
 {{ /instagram:feed }}
 ```
+
 ### Display a specific media
 
 There is a `{{ instagram:media }}` tag, that fetches just one specific media.
@@ -105,6 +107,26 @@ There is a `{{ instagram:media }}` tag, that fetches just one specific media.
         {{ timestamp }}
         {{ username }}
     {{ /children }}
+{{ /instagram:feed }}
+```
+
+### Display profile data
+
+There is a `{{ instagram:profile }}` tag, that fetches the profile information from the API and returns them as an array.
+
+- The `handle` parameter defaults to the first account in the config.
+
+```antlers
+{{ instagram:profile handle="rickastley" }}
+    {{ id }}
+    {{ followers_count }}
+    {{ follows_count }}
+    {{ media_count }}
+    {{ biography }}
+    {{ name }}
+    {{ profile_picture_url }}
+    {{ username }}
+    {{ website }}
 {{ /instagram:feed }}
 ```
 
@@ -149,6 +171,7 @@ In case you need child media, you can enable `include_child_posts` in the addon 
 There is a dedicated `InstagramAPI` class to interact with the API. Its public methods are:
 
 - `cacheKey(...$parts): string`
+- `profile(): Profile`
 - `feed(): Collection`
 - `getAccount(): Account`
 - `getLimit(): int`
