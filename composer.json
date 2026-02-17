@@ -9,8 +9,9 @@
     ],
     "license": "proprietary",
     "require": {
-        "laravel/framework": "^11.0|^12.0",
-        "statamic/cms": "^5.43.0"
+        "php": "^8.2",
+        "laravel/framework": "^11.0 || ^12.0",
+        "statamic/cms": "^5.73.0 || ^6.0"
     },
     "autoload": {
         "psr-4": {
@@ -34,5 +35,9 @@
         }
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "require-dev": {
+        "spatie/laravel-ray": "^1.43",
+        "laravel/pint": "^1.27"
+    }
 }
