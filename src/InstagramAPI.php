@@ -15,10 +15,13 @@ use MarcoRieser\StatamicInstagram\Models\Profile;
 class InstagramAPI
 {
     protected string $apiBaseUrl = 'https://graph.instagram.com';
+
     protected string $businessApiBaseUrl = 'https://graph.instagram.com/v22.0';
 
     protected ?string $handle = null;
+
     protected ?int $limit = null;
+
     protected ?Account $account = null;
 
     public static function cacheKey(...$parts): string
@@ -49,7 +52,7 @@ class InstagramAPI
                     'access_token' => $this->getAccount()->accessToken,
                 ]);
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     throw new \RuntimeException($this->formatException('Could not fetch media list from API.', $response));
                 }
 
@@ -79,34 +82,34 @@ class InstagramAPI
                         'thumbnail_url',
                         'timestamp',
                         'username',
-                        'children'
+                        'children',
                     ])->join(','),
                     'access_token' => $this->getAccount()->accessToken,
                 ]);
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     throw new \RuntimeException($this->formatException('Could not fetch media list from API.', $response));
                 }
 
                 return $response->collect('data')
                     ->map($this->completeChildMedia())
-                    ->map(fn(array $media) => Media::fromApiData($media));
+                    ->map(fn (array $media) => Media::fromApiData($media));
             }
         );
     }
 
     public function getAccount(): Account
     {
-        if (!$this->account) {
+        if (! $this->account) {
             $accounts = collect(config('statamic-instagram.accounts'));
 
-            if (!$accounts->count()) {
+            if (! $accounts->count()) {
                 throw new ItemNotFoundException('No instagram accounts specified in config.');
             }
 
             $handle = $this->getHandle();
 
-            if (!($account = $accounts->firstWhere('handle', $handle))) {
+            if (! ($account = $accounts->firstWhere('handle', $handle))) {
                 throw new ItemNotFoundException("No Instagram account with the handle \"$handle\" specified in config.");
             }
 
@@ -118,12 +121,12 @@ class InstagramAPI
 
     public function getLimit(): int
     {
-        if (!$this->limit) {
-            if (!($limit = config('statamic-instagram.limit'))) {
+        if (! $this->limit) {
+            if (! ($limit = config('statamic-instagram.limit'))) {
                 throw new ItemNotFoundException('Default Instagram limit not specified in config.');
             }
 
-            $this->limit = (int)$limit;
+            $this->limit = (int) $limit;
         }
 
         return $this->limit;
@@ -139,16 +142,16 @@ class InstagramAPI
     public function getUserId(): string
     {
         return Cache::remember(
-            $this->cacheKey($this->getAccount()->handle, "user_id"),
+            $this->cacheKey($this->getAccount()->handle, 'user_id'),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
-                $response = Http::get($this->businessApiBaseUrl . '/me',
+                $response = Http::get($this->businessApiBaseUrl.'/me',
                     [
                         'fields' => 'user_id',
                         'access_token' => $this->getAccount()->accessToken,
                     ]);
 
-                if (!$response->successful() || !($userId = $response->collect()->get('user_id'))) {
+                if (! $response->successful() || ! ($userId = $response->collect()->get('user_id'))) {
                     throw new \RuntimeException($this->formatException('Could not fetch user_id from API.', $response));
                 }
 
@@ -159,10 +162,10 @@ class InstagramAPI
 
     public function getHandle(): string
     {
-        if (!$this->handle) {
+        if (! $this->handle) {
             $accounts = collect(config('statamic-instagram.accounts'));
 
-            if (!$accounts->count()) {
+            if (! $accounts->count()) {
                 throw new ItemNotFoundException('No instagram accounts specified in config.');
             }
 
@@ -187,7 +190,7 @@ class InstagramAPI
 
         return collect([$this->fetchMedia($id)])
             ->map($this->completeChildMedia())
-            ->map(fn(array $media) => Media::fromApiData($media))
+            ->map(fn (array $media) => Media::fromApiData($media))
             ->first();
     }
 
@@ -210,7 +213,7 @@ class InstagramAPI
                     'access_token' => $this->getAccount()->accessToken,
                 ]);
 
-                if (!$response->successful()) {
+                if (! $response->successful()) {
                     throw new \RuntimeException($this->formatException("Could not refresh access token for {$this->getAccount()->handle} account.", $response));
                 }
 
@@ -222,7 +225,7 @@ class InstagramAPI
     protected function completeChildMedia(): \Closure
     {
         return function (array $media) {
-            if (!config('statamic-instagram.include_child_posts')) {
+            if (! config('statamic-instagram.include_child_posts')) {
                 $media['children'] = null;
 
                 return $media;
@@ -230,7 +233,7 @@ class InstagramAPI
 
             if (Arr::has($media, 'children')) {
                 $media['children'] = collect($media['children']['data'])
-                    ->map(fn(array $child) => $this->fetchChildMedia(Arr::get($child, 'id')))
+                    ->map(fn (array $child) => $this->fetchChildMedia(Arr::get($child, 'id')))
                     ->filter()
                     ->map($this->completeChildMedia())
                     ->all();
@@ -253,12 +256,12 @@ class InstagramAPI
                 'permalink',
                 'thumbnail_url',
                 'timestamp',
-                'username'
+                'username',
             ])->join(','),
             'access_token' => $this->getAccount()->accessToken,
         ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw new \RuntimeException($this->formatException("Could not retrieve media with id $id.", $response));
         }
 
@@ -281,12 +284,12 @@ class InstagramAPI
                 'thumbnail_url',
                 'timestamp',
                 'username',
-                'children'
+                'children',
             ])->join(','),
             'access_token' => $this->getAccount()->accessToken,
         ]);
 
-        if (!$response->successful()) {
+        if (! $response->successful()) {
             throw new \RuntimeException($this->formatException("Could not retrieve media with id $id.", $response));
         }
 
@@ -295,11 +298,10 @@ class InstagramAPI
 
     protected function formatException(string $message, Response $response): string
     {
-        if (!($error = $response->json('error'))) {
+        if (! ($error = $response->json('error'))) {
             return $message;
         }
 
-
-        return $message . ' ' . json_encode($error);
+        return $message.' '.json_encode($error);
     }
 }

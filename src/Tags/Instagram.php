@@ -29,6 +29,7 @@ class Instagram extends Tags
         } catch (\Exception $e) {
             if ($this->shouldLog()) {
                 Log::error($e);
+
                 return null;
             }
 
@@ -58,6 +59,7 @@ class Instagram extends Tags
         } catch (\Exception $e) {
             if ($this->shouldLog()) {
                 Log::error($e);
+
                 return collect();
             }
 
@@ -83,6 +85,7 @@ class Instagram extends Tags
         } catch (\Exception $e) {
             if ($this->shouldLog()) {
                 Log::error($e);
+
                 return null;
             }
 
@@ -92,6 +95,6 @@ class Instagram extends Tags
 
     protected function shouldLog(): bool
     {
-        return app()->isProduction() || !app()->hasDebugModeEnabled();
+        return app()->isProduction() || ! app()->hasDebugModeEnabled();
     }
 }

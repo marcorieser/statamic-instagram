@@ -15,5 +15,5 @@ return [
             'handle' => 'default',
             'access_token' => '',
         ],
-    ]
+    ],
 ];
