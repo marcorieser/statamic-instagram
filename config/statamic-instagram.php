@@ -13,7 +13,7 @@ return [
     'accounts' => [
         [
             'handle' => 'default',
-            'access_token' => '',
+            'access_token' => env('INSTAGRAM_ACCESS_TOKEN'),
         ],
     ],
 ];
