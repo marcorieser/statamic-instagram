@@ -16,21 +16,20 @@ class Media implements Augmentable
     use HasAugmentedData;
 
     public function __construct(
-        public int         $id,
-        public ?string     $caption = null,
-        public ?int        $comments_count = null,
-        public ?bool       $is_shared_to_feed = null,
-        public ?int        $like_count = null,
-        public ?string     $media_product_type = null,
-        public ?string     $media_type = null,
-        public ?string     $media_url = null,
-        public ?string     $permalink = null,
-        public ?string     $thumbnail_url = null,
-        public ?Carbon     $timestamp = null,
-        public ?string     $username = null,
+        public int $id,
+        public ?string $caption = null,
+        public ?int $comments_count = null,
+        public ?bool $is_shared_to_feed = null,
+        public ?int $like_count = null,
+        public ?string $media_product_type = null,
+        public ?string $media_type = null,
+        public ?string $media_url = null,
+        public ?string $permalink = null,
+        public ?string $thumbnail_url = null,
+        public ?Carbon $timestamp = null,
+        public ?string $username = null,
         public ?Collection $children = null,
-    )
-    {
+    ) {
         $this->cache();
     }
 
@@ -51,15 +50,15 @@ class Media implements Augmentable
         $children = Arr::get($media, 'children');
 
         if ($comments_count) {
-            $comments_count = (int)$comments_count;
+            $comments_count = (int) $comments_count;
         }
 
         if ($is_shared_to_feed) {
-            $is_shared_to_feed = (bool)$is_shared_to_feed;
+            $is_shared_to_feed = (bool) $is_shared_to_feed;
         }
 
         if ($like_count) {
-            $like_count = (int)$like_count;
+            $like_count = (int) $like_count;
         }
 
         if ($media_product_type) {
@@ -75,7 +74,7 @@ class Media implements Augmentable
         }
 
         if ($children) {
-            $children = collect($children)->map(fn(array $media) => Media::fromApiData($media));
+            $children = collect($children)->map(fn (array $media) => Media::fromApiData($media));
         }
 
         return new self($id, $caption, $comments_count, $is_shared_to_feed, $like_count, $media_product_type, $media_type, $media_url, $permalink, $thumbnail_url, $timestamp, $username, $children);
@@ -108,7 +107,7 @@ class Media implements Augmentable
         Cache::remember(
             InstagramAPI::cacheKey('media', $this->id),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
-            fn() => $this
+            fn () => $this
         );
     }
 }
