@@ -53,7 +53,7 @@ class InstagramAPI
                 ]);
 
                 if (! $response->successful()) {
-                    throw new \RuntimeException($this->formatException('Could not fetch media list from API.', $response));
+                    throw new \RuntimeException($this->formatException('Could not fetch profile from API.', $response));
                 }
 
                 return Profile::fromApiData($response->json());
@@ -64,7 +64,7 @@ class InstagramAPI
     public function feed(): Collection
     {
         return Cache::remember(
-            $this->cacheKey($this->getAccount()->handle, 'feed', $this->getLimit()),
+            $this->cacheKey($this->getAccount()->handle, 'feed', $this->getLimit(), (int) config('statamic-instagram.include_child_posts')),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
                 $response = Http::get("$this->businessApiBaseUrl/{$this->getUserId()}/media", [

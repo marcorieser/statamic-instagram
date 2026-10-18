@@ -3,8 +3,6 @@
 namespace MarcoRieser\StatamicInstagram\Models;
 
 use Illuminate\Support\Arr;
-use Illuminate\Support\Facades\Cache;
-use MarcoRieser\StatamicInstagram\InstagramAPI;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 
@@ -22,9 +20,7 @@ class Profile implements Augmentable
         public ?string $profile_picture_url,
         public ?string $username,
         public ?string $website,
-    ) {
-        $this->cache();
-    }
+    ) {}
 
     public static function fromApiData(array $profile): self
     {
@@ -69,14 +65,5 @@ class Profile implements Augmentable
             ->filter(fn ($value) => $value !== null)
             ->sortKeys()
             ->all();
-    }
-
-    protected function cache(): void
-    {
-        Cache::remember(
-            InstagramAPI::cacheKey('profile', $this->id),
-            now()->addSeconds(config('statamic-instagram.cache.duration')),
-            fn () => $this
-        );
     }
 }

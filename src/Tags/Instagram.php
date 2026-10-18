@@ -79,9 +79,13 @@ class Instagram extends Tags
                 $api->setHandle($handle);
             }
 
+            if (! ($id = $this->params->int('id'))) {
+                throw new \InvalidArgumentException('The "id" parameter is required.');
+            }
+
             $api->refreshAccessToken();
 
-            return $api->media($this->params->int('id'));
+            return $api->media($id);
         } catch (\Exception $e) {
             if ($this->shouldLog()) {
                 Log::error($e);
