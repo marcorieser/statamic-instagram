@@ -97,7 +97,7 @@ class Media implements Augmentable
             'username' => $this->username,
             'children' => $this->children,
         ])
-            ->filter()
+            ->filter(fn ($value) => $value !== null)
             ->sortKeys()
             ->all();
     }
