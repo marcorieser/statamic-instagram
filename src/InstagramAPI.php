@@ -196,6 +196,12 @@ class InstagramAPI
 
     public function refreshAccessToken(): bool
     {
+        $failedKey = $this->cacheKey($this->getAccount()->handle, 'token_refresh_failed');
+
+        if (Cache::has($failedKey)) {
+            return false;
+        }
+
         $durationMinOneDayMaxTwoMonths = min(
             now()->addMonths(2)->subDay(),
             max(
@@ -204,22 +210,28 @@ class InstagramAPI
             ),
         );
 
-        return Cache::remember(
-            $this->cacheKey($this->getAccount()->handle, 'token_refreshed'),
-            $durationMinOneDayMaxTwoMonths,
-            function () {
-                $response = Http::get("$this->apiBaseUrl/refresh_access_token", [
-                    'grant_type' => 'ig_refresh_token',
-                    'access_token' => $this->getAccount()->accessToken,
-                ]);
+        try {
+            return Cache::remember(
+                $this->cacheKey($this->getAccount()->handle, 'token_refreshed'),
+                $durationMinOneDayMaxTwoMonths,
+                function () {
+                    $response = Http::get("$this->apiBaseUrl/refresh_access_token", [
+                        'grant_type' => 'ig_refresh_token',
+                        'access_token' => $this->getAccount()->accessToken,
+                    ]);
 
-                if (! $response->successful()) {
-                    throw new \RuntimeException($this->formatException("Could not refresh access token for {$this->getAccount()->handle} account.", $response));
+                    if (! $response->successful()) {
+                        throw new \RuntimeException($this->formatException("Could not refresh access token for {$this->getAccount()->handle} account.", $response));
+                    }
+
+                    return true;
                 }
+            );
+        } catch (\RuntimeException $e) {
+            Cache::put($failedKey, true, now()->addMinutes(15));
 
-                return true;
-            }
-        );
+            throw $e;
+        }
     }
 
     protected function completeChildMedia(): \Closure
