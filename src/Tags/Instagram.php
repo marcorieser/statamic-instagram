@@ -102,6 +102,10 @@ class Instagram extends Tags
         try {
             $api->refreshAccessToken();
         } catch (\Exception $e) {
+            if (! $this->shouldLog()) {
+                throw $e;
+            }
+
             Log::warning($e->getMessage());
         }
     }
