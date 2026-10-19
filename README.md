@@ -107,7 +107,7 @@ There is a `{{ instagram:media }}` tag, that fetches just one specific media.
         {{ timestamp }}
         {{ username }}
     {{ /children }}
-{{ /instagram:feed }}
+{{ /instagram:media }}
 ```
 
 ### Display profile data
@@ -127,7 +127,7 @@ There is a `{{ instagram:profile }}` tag, that fetches the profile information f
     {{ profile_picture_url }}
     {{ username }}
     {{ website }}
-{{ /instagram:feed }}
+{{ /instagram:profile }}
 ```
 
 ### Manipulate an image
@@ -149,7 +149,7 @@ _Since Statamic `v5.43.0`, Glide supports external URLs with query params. There
 
 A long-lived access token is valid for two months.
 This would mean that it has to be refreshed manually before it expires. 
-When using the `{{ instagram:feed }}` `{{ instagram:media }}` tags,
+When using the `{{ instagram:feed }}`, `{{ instagram:media }}` and `{{ instagram:profile }}` tags,
 this is handled automatically for you. 
 
 If you use the API exclusively in PHP, please make sure that you update the token yourself via the scheduler:
