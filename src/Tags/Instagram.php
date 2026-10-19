@@ -23,7 +23,7 @@ class Instagram extends Tags
                 $api->setHandle($handle);
             }
 
-            $api->refreshAccessToken();
+            $this->refreshAccessToken($api);
 
             return $api->profile();
         } catch (\Exception $e) {
@@ -53,7 +53,7 @@ class Instagram extends Tags
                 $api->setHandle($handle);
             }
 
-            $api->refreshAccessToken();
+            $this->refreshAccessToken($api);
 
             return $api->feed();
         } catch (\Exception $e) {
@@ -83,7 +83,7 @@ class Instagram extends Tags
                 throw new \InvalidArgumentException('The "id" parameter is required.');
             }
 
-            $api->refreshAccessToken();
+            $this->refreshAccessToken($api);
 
             return $api->media($id);
         } catch (\Exception $e) {
@@ -94,6 +94,19 @@ class Instagram extends Tags
             }
 
             throw $e;
+        }
+    }
+
+    protected function refreshAccessToken(InstagramAPI $api): void
+    {
+        try {
+            $api->refreshAccessToken();
+        } catch (\Exception $e) {
+            if (! $this->shouldLog()) {
+                throw $e;
+            }
+
+            Log::warning($e->getMessage());
         }
     }
 
