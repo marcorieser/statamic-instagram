@@ -26,7 +26,28 @@ composer require marcorieser/statamic-instagram
 
 ### Creating a Meta App / an Access Token
 
-Create an Access Token for the API with these steps:
+Since late October 2026, new Meta apps no longer offer `API setup with Instagram login`.
+If your app only offers `API setup with Unified login`, follow the Unified login steps. Otherwise use the Instagram login steps.
+
+#### Unified login
+
+You need an Instagram Business or Creator account and a Meta business portfolio (free).
+
+1. Create an app at https://developers.facebook.com with the use case `Manage messaging & content on Instagram` and connect it to your business portfolio.
+2. Open `Use cases` > `Customize` and select `API setup with Unified login`.
+3. Create a configuration with the access token type `System user access token`, expiration `Never`, your Instagram account as asset and the permission `instagram_basic`.
+4. Generate the token and add it to your `.env` file:
+    ```
+    INSTAGRAM_ACCESS_TOKEN=your-token
+    INSTAGRAM_LOGIN=unified
+    ```
+5. Only if the token has more than one Instagram account assigned: set `INSTAGRAM_USER_ID`. You find the IDs at `https://graph.facebook.com/v26.0/me/assigned_instagram_accounts?access_token=your-token`.
+
+If the API answers with a permission error, add `pages_show_list`, `pages_read_engagement` and `business_management` to the configuration.
+Unified tokens never expire, so the addon does not refresh them.
+Meta changes its setup screens regularly. If a label differs, follow Meta's [documentation](https://developers.facebook.com/documentation/instagram-platform).
+
+#### Instagram login
 
 - Login with your Instagram credentials at https://developers.facebook.com
 - Create a new app (choose `Other` as use case and `Business` as the app type)
