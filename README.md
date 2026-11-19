@@ -168,6 +168,8 @@ _Since Statamic `v5.43.0`, Glide supports external URLs with query params. There
 
 ### Refreshing Tokens
 
+This only applies to Instagram login. Unified login tokens never expire and are never refreshed.
+
 A long-lived access token is valid for two months.
 This would mean that it has to be refreshed manually before it expires. 
 When using the `{{ instagram:feed }}`, `{{ instagram:media }}` and `{{ instagram:profile }}` tags,
