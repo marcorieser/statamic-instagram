@@ -49,13 +49,19 @@ Meta changes its setup screens regularly. If a label differs, follow Meta's [doc
 
 #### Instagram login
 
-- Login with your Instagram credentials at https://developers.facebook.com
-- Create a new app (choose `Other` as use case and `Business` as the app type)
-- Add `Instagram` as a product to your app
-- Link your instagram account at `1. Generate access tokens` in the `API setup with Instagram login` section of your app
-- Generate a token and add it to the config in Statamic 
+You need an Instagram Business or Creator account. Only available for apps that still offer `API setup with Instagram login`.
 
-Further information on that topic in Meta's [docs](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/create-a-meta-app-with-instagram).
+1. Create an app at https://developers.facebook.com (use case `Other`, app type `Business`) and add `Instagram` as a product.
+2. Open `API setup with Instagram login`. If your Instagram account is not selectable, add it as an `Instagram Tester` under `App roles` > `Roles` and accept the invitation in the Instagram app.
+3. At `1. Generate access tokens`, add your Instagram account and generate a token with the permission `instagram_business_basic`.
+4. Add the token to your `.env` file:
+    ```
+    INSTAGRAM_LOGIN_METHOD=instagram
+    INSTAGRAM_ACCESS_TOKEN=your-token
+    ```
+
+The token is valid for 60 days. The addon refreshes it automatically, see [Refreshing Tokens](#refreshing-tokens).
+For more details see Meta's [documentation](https://developers.facebook.com/docs/instagram-platform/instagram-api-with-instagram-login/create-a-meta-app-with-instagram).
 
 ### Display the feed
 
