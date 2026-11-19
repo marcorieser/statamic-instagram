@@ -38,8 +38,8 @@ You need an Instagram Business or Creator account and a Meta business portfolio 
 3. Create a configuration with the access token type `System user access token`, expiration `Never`, your Instagram account as asset and the permission `instagram_basic`.
 4. Generate the token and add it to your `.env` file:
     ```
+    INSTAGRAM_LOGIN_METHOD=unified
     INSTAGRAM_ACCESS_TOKEN=your-token
-    INSTAGRAM_LOGIN=unified
     ```
 5. Only if the token has more than one Instagram account assigned: set `INSTAGRAM_USER_ID`. You find the IDs at `https://graph.facebook.com/v26.0/me/assigned_instagram_accounts?access_token=your-token`.
 
