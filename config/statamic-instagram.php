@@ -13,7 +13,9 @@ return [
     'accounts' => [
         [
             'handle' => 'default',
-            'access_token' => env('INSTAGRAM_ACCESS_TOKEN'),
+            'login_method' => env('INSTAGRAM_LOGIN_METHOD', 'instagram'), // 'instagram' (Instagram login) or 'unified' (Unified login / system user token)
+            'access_token' => env('INSTAGRAM_ACCESS_TOKEN'), // Instagram login token, or a system user token when login_method is "unified"
+            'user_id' => env('INSTAGRAM_USER_ID'), // Optional. Skips the user id lookup. Needed if a unified token has several Instagram accounts assigned.
         ],
     ],
 ];
