@@ -16,8 +16,6 @@ class InstagramAPI
 {
     protected string $apiBaseUrl = 'https://graph.instagram.com';
 
-    protected string $businessApiBaseUrl = 'https://graph.instagram.com/v22.0';
-
     protected ?string $handle = null;
 
     protected ?int $limit = null;
@@ -37,7 +35,7 @@ class InstagramAPI
             $this->cacheKey($this->getAccount()->handle, 'profile'),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
-                $response = Http::get("$this->businessApiBaseUrl/{$this->getUserId()}", [
+                $response = Http::get("{$this->businessApiBaseUrl()}/{$this->getUserId()}", [
                     'fields' => collect([
                         'biography',
                         'followers_count',
@@ -67,7 +65,7 @@ class InstagramAPI
             $this->cacheKey($this->getAccount()->handle, 'feed', $this->getLimit(), (int) config('statamic-instagram.include_child_posts')),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
             function () {
-                $response = Http::get("$this->businessApiBaseUrl/{$this->getUserId()}/media", [
+                $response = Http::get("{$this->businessApiBaseUrl()}/{$this->getUserId()}/media", [
                     'limit' => $this->getLimit(),
                     'fields' => collect([
                         'id',
@@ -141,22 +139,16 @@ class InstagramAPI
 
     public function getUserId(): string
     {
+        if ($userId = $this->getAccount()->userId) {
+            return $userId;
+        }
+
         return Cache::remember(
             $this->cacheKey($this->getAccount()->handle, 'user_id'),
             now()->addSeconds(config('statamic-instagram.cache.duration')),
-            function () {
-                $response = Http::get($this->businessApiBaseUrl.'/me',
-                    [
-                        'fields' => 'user_id',
-                        'access_token' => $this->getAccount()->accessToken,
-                    ]);
-
-                if (! $response->successful() || ! ($userId = $response->collect()->get('user_id'))) {
-                    throw new \RuntimeException($this->formatException('Could not fetch user_id from API.', $response));
-                }
-
-                return $userId;
-            }
+            fn () => $this->getAccount()->usesUnifiedLogin()
+                ? $this->fetchUnifiedUserId()
+                : $this->fetchInstagramUserId()
         );
     }
 
@@ -196,6 +188,11 @@ class InstagramAPI
 
     public function refreshAccessToken(): bool
     {
+        // Unified login issues system-user tokens that never expire.
+        if ($this->getAccount()->usesUnifiedLogin()) {
+            return true;
+        }
+
         $failedKey = $this->cacheKey($this->getAccount()->handle, 'token_refresh_failed');
 
         if (Cache::has($failedKey)) {
@@ -234,6 +231,46 @@ class InstagramAPI
         }
     }
 
+    protected function businessApiBaseUrl(): string
+    {
+        return $this->getAccount()->usesUnifiedLogin()
+            ? 'https://graph.facebook.com/v26.0'
+            : 'https://graph.instagram.com/v22.0';
+    }
+
+    protected function fetchInstagramUserId(): string
+    {
+        $response = Http::get("{$this->businessApiBaseUrl()}/me", [
+            'fields' => 'user_id',
+            'access_token' => $this->getAccount()->accessToken,
+        ]);
+
+        if (! $response->successful() || ! ($userId = $response->collect()->get('user_id'))) {
+            throw new \RuntimeException($this->formatException('Could not fetch user_id from API.', $response));
+        }
+
+        return $userId;
+    }
+
+    protected function fetchUnifiedUserId(): string
+    {
+        $response = Http::get("{$this->businessApiBaseUrl()}/me/assigned_instagram_accounts", [
+            'access_token' => $this->getAccount()->accessToken,
+        ]);
+
+        if (! $response->successful()) {
+            throw new \RuntimeException($this->formatException('Could not fetch assigned Instagram accounts from API.', $response));
+        }
+
+        $ids = $response->collect('data')->pluck('id');
+
+        if ($ids->count() !== 1) {
+            throw new \RuntimeException("Expected one Instagram account for this token, found {$ids->count()}. Set \"user_id\" in the account config to choose one.");
+        }
+
+        return (string) $ids->first();
+    }
+
     protected function completeChildMedia(): \Closure
     {
         return function (array $media) {
@@ -257,7 +294,7 @@ class InstagramAPI
 
     protected function fetchChildMedia(int $id): array
     {
-        $response = Http::get("$this->businessApiBaseUrl/$id", [
+        $response = Http::get("{$this->businessApiBaseUrl()}/$id", [
             'fields' => collect([
                 'id',
                 'comments_count',
@@ -282,7 +319,7 @@ class InstagramAPI
 
     protected function fetchMedia(int $id): array
     {
-        $response = Http::get("$this->businessApiBaseUrl/$id", [
+        $response = Http::get("{$this->businessApiBaseUrl()}/$id", [
             'fields' => collect([
                 'id',
                 'caption',
