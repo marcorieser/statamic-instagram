@@ -6,7 +6,8 @@
 
 - Fetch Instagram posts via Meta's [Instagram Business API](https://developers.facebook.com/docs/instagram-platform)
 - Fetch Instagram profile data via Meta's [Instagram Business API](https://developers.facebook.com/docs/instagram-platform)
-- Auto refreshing of Access Tokens
+- Supports Instagram login and Unified login
+- Auto refreshing of Instagram login Access Tokens
 
 ## How to Install
 
@@ -21,7 +22,7 @@ composer require marcorieser/statamic-instagram
 ### Installation
 
 - Install the addon
-- Add your Access Token as `INSTAGRAM_ACCESS_TOKEN` to your `.env` file. If you do not have a token, follow the instructions below.
+- Create an Access Token and add it to your `.env` file, see [Creating a Meta App / an Access Token](#creating-a-meta-app--an-access-token). If you already have one, add it as `INSTAGRAM_ACCESS_TOKEN`.
 - (Optionally) Publish the addon config by running `php artisan vendor:publish --tag=statamic-instagram-config`
 
 ### Creating a Meta App / an Access Token
